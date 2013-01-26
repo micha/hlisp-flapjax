@@ -1,8 +1,11 @@
 (ns flapjax.core
+  (:use-macros
+    [hlisp.macros :only [<- <<- def-values]])
   (:require 
-    [jayq.core    :as jq]
-    [jayq.util    :as ju]
-    [flapjax.dom  :as dom]
+    [clojure.string :as string]
+    [jayq.core      :as jq]
+    [jayq.util      :as ju]
+    [flapjax.dom    :as dom]
     F))
 
 (declare receiverE sendE)
@@ -228,6 +231,12 @@
   ([streamE ks not-found]
    (mapE #(get-in % ks not-found) streamE)))
 
+(defn atomE
+  [atom]
+  (let [retE (receiverE)]
+    (add-watch atom (gensym) #(sendE retE %4))
+    retE))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;  BEHAVIOR FUNCTIONS  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn consB
@@ -265,6 +274,21 @@
 (defn not=B
   [sourceB v]
   (liftB #(not= v %) sourceB))
+
+(defn locationHashB
+  [dfl]
+  (-> (timerE 50)
+    (<- mapE #(.-hash js/window.location))
+    (<- mapE #(if (string/blank? %) dfl (subs % 1)))
+    (E->B dfl)))
+
+(defn logB
+  [inB tag]
+  (liftB #(js/console.log tag (ju/clj->js %)) inB))
+
+(defn atomB
+  [atom]
+  (E->B (atomE atom) @atom))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  CORE EVENTS  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

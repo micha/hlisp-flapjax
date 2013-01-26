@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :manifest {"hlisp-provides" "flapjax"}
   :dependencies [[org.clojure/clojure "1.4.0"]
+                 [hlisp-macros "0.1.0-SNAPSHOT"]
                  [hlisp-jayq "0.1.0-SNAPSHOT"]])
