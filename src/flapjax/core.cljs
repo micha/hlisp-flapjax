@@ -8,7 +8,7 @@
     [flapjax.dom    :as dom]
     F))
 
-(declare receiverE sendE)
+(declare receiverE sendE consB)
 
 (def EventStream  F/EventStream)
 (def Behavior     F/Behavior)
@@ -284,11 +284,15 @@
 
 (defn logB
   [inB tag]
-  (liftB #(js/console.log tag (ju/clj->js %)) inB))
+  (mapE #(js/console.log tag (ju/clj->js %)) (B->E inB)))
 
 (defn atomB
   [atom]
   (E->B (atomE atom) @atom))
+
+(defn filterRepeatsB
+  [inB]
+  (E->B (changes inB) (valueNow inB)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  CORE EVENTS  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -4,6 +4,8 @@
     [jayq.core  :as jq]
     [jayq.util  :as ju]))
 
+(declare ids)
+
 (defn id      [e] (peek (ids e)))
 (defn ids     [e] (.-ids e))
 (defn id!     [e] (if-not (seq (ids e)) (hl/clone e) e))
