@@ -375,11 +375,18 @@
 (def domCss           (dotoDom dom/css!))
 (def domAddClass      (dotoDom dom/add-class!))
 (def domRemoveClass   (dotoDom dom/remove-class!))
-(def domToggleClass   (dotoDom (partial apply dom/toggle-class!)))
 (def domToggle        (dotoDom dom/toggle!))
 (def domSlideToggle   (dotoDom dom/slide-toggle!))
 (def domFadeToggle    (dotoDom dom/fade-toggle!))
 (def domValue         (dotoDom dom/value!))
 (def domFocus         (dotoDom dom/focus!))
 (def domSelect        (dotoDom dom/select!))
+
+(defn domToggleClass
+  ([e streamE]
+   (doE streamE (partial apply dom/toggle-class! e)))
+  ([e css-class streamE]
+   (doE streamE (partial dom/toggle-class! e css-class))))
+
+
 
