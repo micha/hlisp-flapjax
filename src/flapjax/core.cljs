@@ -384,9 +384,11 @@
 
 (defn domToggleClass
   ([e streamE]
-   (doE streamE (partial apply dom/toggle-class! e)))
+   (doE streamE (partial apply dom/toggle-class! e))
+   e)
   ([e css-class streamE]
-   (doE streamE (partial dom/toggle-class! e css-class))))
+   (doE streamE (partial dom/toggle-class! e css-class))
+   e))
 
 
 
