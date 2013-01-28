@@ -11,6 +11,10 @@
 (defn id!     [e] (if-not (seq (ids e)) (hl/clone e) e))
 (defn is-jq?  [e] (string? (.-jquery e)))
 
+(->
+  (jq/$ "body")
+  (.on "submit" (fn [event] (.preventDefault event))))
+
 (defn filter-id
   [x]
   (fn [v]
@@ -33,6 +37,17 @@
   (jq/$ (str "[data-hl~='" x "']")))
 
 (def dom-get (comp find-id id))
+
+(defn delegate-blur!
+  [e]  
+  (let [x (id e)]
+    (when-not (::delegated-blur (meta e))
+      (jq/$ (fn []
+              (let [ev (.Event js/jQuery "hl-blur")
+                    el (find-id x)]
+                (set! (.-target ev) (.get el 0))
+                (.on el "blur" #(.trigger (jq/$ "body") ev)))) 
+            (vary-meta e assoc ::delegated-blur true)))))
 
 (defn- text-val!
   ([e]
@@ -120,6 +135,14 @@
   (if v
     (.fadeIn (.hide (dom-get elem)) "fast")
     (.fadeOut (dom-get elem) "fast")))
+
+(defn focus!
+  [elem _]
+  (.focus (dom-get elem)))
+
+(defn select!
+  [elem _]
+  (.select (dom-get elem)))
 
 (defn text!
   [elem v]

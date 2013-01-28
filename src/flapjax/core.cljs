@@ -284,7 +284,8 @@
 
 (defn logB
   [inB tag]
-  (mapE #(js/console.log tag (ju/clj->js %)) (B->E inB)))
+  (mapE #(js/console.log tag (ju/clj->js %))
+        (filterRepeatsE (mergeE (B->E inB) (oneE (valueNow inB))))))
 
 (defn atomB
   [atom]
@@ -301,18 +302,21 @@
   (let [r (receiverE)]
     (->
       (jq/$ "body")
-      (.on event (fn [event]
-                   (sendE r event)
-                   (if default (default event) true))))
+      (.on event (fn [ev]
+                   (sendE r ev)
+                   (if default (default ev) true))))
     r))
 
 (def *submit*     (core-event "submit" (constantly false)))
 (def *click*      (core-event "click"))
+(def *dblclick*   (core-event "dblclick"))
 (def *change*     (core-event "change"))
 (def *mousedown*  (core-event "mousedown"))
 (def *mouseup*    (core-event "mouseup"))
 (def *mouseover*  (core-event "mouseover"))
 (def *mouseout*   (core-event "mouseout"))
+(def *blur*       (core-event "hl-blur"))
+(def *focus*      (core-event "hl-focus"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  NOZZLES  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -322,12 +326,18 @@
     (filterE (dom/filter-id (dom/id e)))
     (filterE dom/filter-not-disabled)))
 
-(def onSubmitE     (partial onE *submit*))
-(def onClickE      (partial onE *click*))
-(def onMouseDownE  (partial onE *mousedown*))
-(def onMouseUpE    (partial onE *mouseup*))
-(def onMouseOverE  (partial onE *mouseover*))
-(def onMouseOutE   (partial onE *mouseout*))
+(def onSubmitE      (partial onE *submit*))
+(def onClickE       (partial onE *click*))
+(def onDblClickE    (partial onE *dblclick*))
+(def onMouseDownE   (partial onE *mousedown*))
+(def onMouseUpE     (partial onE *mouseup*))
+(def onMouseOverE   (partial onE *mouseover*))
+(def onMouseOutE    (partial onE *mouseout*))
+
+(defn onBlurE
+  [e]
+  (dom/delegate-blur! e)
+  (onE *blur* e))
 
 (defn onChangeE
   [e]
@@ -370,4 +380,6 @@
 (def domSlideToggle   (dotoDom dom/slide-toggle!))
 (def domFadeToggle    (dotoDom dom/fade-toggle!))
 (def domValue         (dotoDom dom/value!))
+(def domFocus         (dotoDom dom/focus!))
+(def domSelect        (dotoDom dom/select!))
 
